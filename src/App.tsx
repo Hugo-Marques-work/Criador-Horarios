@@ -40,6 +40,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaypal } from '@fortawesome/free-brands-svg-icons'
 import Cookies from 'universal-cookie'
 
+//jquery
+import $ from 'jquery'
+
 type BuiltCourse = {
 	course: Course,
 	availableShifts: Shift[],
@@ -66,12 +69,16 @@ class App extends React.Component <{
 	selectedDegree: Degree | null = null
 	chosenSchedule: React.RefObject<Schedule>
 	topBar: React.RefObject<TopBar>
+	thingy: number
 
 	// eslint-disable-next-line
 	constructor(props: any) {
 		super(props)
 		this.onSelectedCourse = this.onSelectedCourse.bind(this)
 		this.onSelectedShift = this.onSelectedShift.bind(this)
+		this.setClassName = this.setClassName.bind(this)
+		this.onMouseLeaveShift = this.onMouseLeaveShift.bind(this)
+		this.onMouseEnterShift = this.onMouseEnterShift.bind(this)
 		this.clearSelectedShifts = this.clearSelectedShifts.bind(this)
 		this.getLink = this.getLink.bind(this)
 		this.changeCampi = this.changeCampi.bind(this)
@@ -80,6 +87,7 @@ class App extends React.Component <{
 		this.showAlert = this.showAlert.bind(this)
 		this.chosenSchedule = React.createRef()
 		this.topBar = React.createRef()
+		this.thingy = 0
 	}
 
 	async componentDidMount() {
@@ -91,6 +99,15 @@ class App extends React.Component <{
 		this.setState({
 			loading: false
 		})
+
+		/*
+		$(".whatever").addClass("hover-i");
+		$("").mouseenter( function() {
+			$($(this).attr("class")).addClass("active");
+		} ).mouseleave( function() {
+			$($(this).attr("class")).removeClass("active");
+		} );
+		*/
 	}
 
 	async onSelectedCourse(selectedCourses: Course[]): Promise<void> {
@@ -225,6 +242,50 @@ class App extends React.Component <{
 
 			this.changeUrl(false)
 		}
+	}
+
+	onMouseEnterShift(shiftName: string, arr: Shift[]): void {
+		
+		const chosenShift = arr.find((s: Shift) => s.name === shiftName)
+		if(chosenShift) {
+			const shiftCourse = this.state.selectedCourses.courses.filter((c) => c.id === chosenShift.courseId)
+			$('.course-' + chosenShift.courseId).each(function() {
+				if($(this).hasClass('type-' + chosenShift.type)) {
+					$(this).addClass('active')
+				}
+				else {
+					$(this).addClass('semi-active')
+				}
+			})
+		}
+	}
+
+	onMouseLeaveShift(shiftName: string, arr: Shift[]): void {
+		
+		const chosenShift = arr.find((s: Shift) => s.name === shiftName)
+		if(chosenShift) {
+			const shiftCourse = this.state.selectedCourses.courses.filter((c) => c.id === chosenShift.courseId)
+			$('.course-' + chosenShift.courseId).each(function() {
+				if($(this).hasClass('type-' + chosenShift.type)) {
+					$(this).removeClass('active')
+				}
+				else {
+					$(this).removeClass('semi-active')
+				}
+			})
+		}
+	}
+
+	setClassName(shiftName: string, arr: Shift[]): string {
+
+		const chosenShift = arr.find((s: Shift) => s.name === shiftName)
+		if(chosenShift) {
+			const shiftCourse = this.state.selectedCourses.courses.filter((c) => c.id === chosenShift.courseId)
+			console.log(shiftCourse)
+			console.log(chosenShift)
+			return 'course-' + chosenShift.courseId + ' type-' + chosenShift.type
+		}
+		return ''
 	}
 
 	getCoursesBySelectedShifts(): Course[] {
@@ -445,6 +506,9 @@ class App extends React.Component <{
 							<Card className={classes.card as string}>
 								<CardContent className={classes.cardContent as string}>
 									<Schedule
+										setClassName={(id: string) => { return this.setClassName(id, this.state.availableShifts)} }
+										onMouseEnterEvent={(id: string) => this.onMouseEnterShift(id, this.state.availableShifts)}
+										onMouseLeaveEvent={(id: string) => this.onMouseLeaveShift(id, this.state.availableShifts)}
 										onSelectedEvent={(id: string) => this.onSelectedShift(id, this.state.availableShifts)}
 										events={this.getAllLessons()}
 									/>
@@ -479,6 +543,9 @@ class App extends React.Component <{
 							<Card className={classes.card as string}>
 								<CardContent className={classes.cardContent as string}>
 									<Schedule
+										setClassName={(id: string) => { return this.setClassName(id, this.state.availableShifts)} }
+										onMouseEnterEvent={(id: string) => this.onMouseEnterShift(id, this.state.availableShifts)}
+										onMouseLeaveEvent={(id: string) => this.onMouseLeaveShift(id, this.state.availableShifts)}
 										onSelectedEvent={(id: string) => this.onSelectedShift(id, this.state.selectedShifts)}
 										events={this.getSelectedLessons()} ref={this.chosenSchedule}
 									/>

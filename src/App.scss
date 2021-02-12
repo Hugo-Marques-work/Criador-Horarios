@@ -104,6 +104,22 @@ body {
   cursor: pointer;
 }
 
+.fc-media-screen .fc-timegrid-event {
+	border-width: 5px;
+	padding: 5px;
+}
+
+
+.fc-media-screen .fc-timegrid-event.active {
+	border-width: 10px;
+	padding: 0px;
+	border-color:black !important;
+}
+
+.fc-media-screen .fc-timegrid-event.semi-active {
+	border-color:black !important;
+}
+
 .selected {
 	color: red;
 }
